@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+        content="So‑Lina — Haute maroquinerie & perlage. Atelier d'art au Congo. Collection, formation, pièces uniques." />
+    <title>So‑Lina | Haute Maroquinerie & Perlage</title>
+
+    <!-- Preconnect & Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet" />
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --primary: #121212;
+            --accent: #c49a6c;
+            --cream: #f9f7f2;
+            --white: #ffffff;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --transition-smooth: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            --glass-bg: rgba(249, 247, 242, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.25);
+        }
+
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--cream);
+            color: var(--primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Custom cursor toggle-friendly */
+        .cursor-enabled body,
+        .cursor-enabled * {
+            cursor: none;
+        }
+
+        #custom-cursor,
+        #cursor-aura {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            display: none;
+        }
+
+        .cursor-enabled #custom-cursor,
+        .cursor-enabled #cursor-aura {
+            display: block;
+        }
+
+        #custom-cursor {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        #cursor-aura {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+
+        /* Background canvas */
+        #canvas-fibres {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        /* NAV */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 60px;
+            z-index: 1000;
+            transition: var(--transition-smooth);
+            background: transparent;
+        }
+
+        .nav.scrolled {
+            padding: 12px 60px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            perspective: 600px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.4s;
+        }
+
+        .nav-links a:hover {
+            transform: translateZ(10px);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cart button {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* HERO */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+                url('https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transform: scale(1.08);
+        }
+
+        .hero-content {
+            text-align: center;
+            color: var(--white);
+            padding: 0 5%;
+        }
+
+        .hero-content p {
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+
+        .hero-content h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(3rem, 10vw, 9rem);
+            line-height: 0.9;
+            margin: 16px 0 28px;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .cta {
+            display: inline-block;
+            padding: 14px 28px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(6px);
+        }
+
+        .cta:hover {
+            background: rgba(196, 154, 108, 0.25);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* SECTION */
+        .section {
+            padding: 120px 8%;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Sponsors marquee */
+        .sponsors-wrap {
+            overflow: hidden;
+            padding: 24px 0;
+        }
+
+        .sponsors {
+            display: flex;
+            gap: 80px;
+            opacity: 0.5;
+            filter: grayscale(1);
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .sponsors span {
+            font-weight: 300;
+            letter-spacing: 5px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: transform 0.3s ease;
+        }
+
+        .sponsors span:hover {
+            transform: rotateY(15deg);
+        }
+
+        /* About */
+        .about {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .about-img {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .about-img img {
+            width: 100%;
+            height: clamp(320px, 60vh, 600px);
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .about-img::after {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: -24px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--accent);
+            z-index: -1;
+            border-radius: 8px;
+        }
+
+        .about-text {
+            max-width: 560px;
+        }
+
+        .about-text h2 {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 20px;
+        }
+
+        .about-text p.accent {
+            margin-top: 16px;
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        /* Product grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .product-card {
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: var(--transition-smooth);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .product-inner {
+            position: relative;
+            width: 100%;
+            height: 420px;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+        }
+
+        .product-card:hover .product-inner {
+            transform: rotateY(180deg);
+        }
+
+        .product-face,
+        .product-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-face img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.2s ease;
+        }
+
+        .product-card:hover .product-face img {
+            transform: scale(1.08);
+        }
+
+        .product-back {
+            background: linear-gradient(135deg, #fff, #f3eee6);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .product-info {
+            margin-top: 12px;
+        }
+
+        .product-info h3 {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+        }
+
+        .product-info p {
+            color: var(--accent);
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        /* Formation */
+        .formation {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .formation-flex {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .formation-form {
+            background: var(--white);
+            padding: 40px;
+            color: var(--primary);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .formation-form form {
+            display: grid;
+            gap: 20px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 14px 0;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 8px 20px rgba(196, 154, 108, 0.15);
+        }
+
+        .btn-luxe {
+            background: var(--primary);
+            color: var(--white);
+            padding: 16px 24px;
+            border: none;
+            border-radius: 999px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-luxe:hover {
+            background: var(--accent);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-luxe::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-luxe:hover::after {
+            left: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 80px 8% 40px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .socials a {
+            color: var(--primary);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+            display: inline-flex;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .socials a:hover {
+            color: var(--accent);
+            transform: rotateZ(8deg) scale(1.1);
+        }
+
+        .footer p {
+            letter-spacing: 5px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .nav {
+                padding: 16px 24px;
+            }
+
+            .about {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .formation-flex {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content p {
+                letter-spacing: 4px;
+            }
+
+            .sponsors {
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body class="cursor-enabled">
+    <!-- Custom cursor (toggle by removing 'cursor-enabled' on body) -->
+    <div id="custom-cursor" aria-hidden="true"></div>
+    <div id="cursor-aura" aria-hidden="true"></div>
+
+    <!-- Background canvas -->
+    <canvas id="canvas-fibres"></canvas>
+
+    <!-- NAV -->
+    <nav class="nav" role="navigation" aria-label="Navigation principale">
+        <div class="logo">So‑Lina</div>
+        <div class="nav-links">
+            <a href="#home">Collection</a>
+            <a href="#about">L'esprit</a>
+            <a href="#formation">Atelier</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <div class="nav-cart">
+            <button aria-label="Panier"><i class="fas fa-shopping-bag" aria-hidden="true"></i></button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home" aria-label="Section d'introduction">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-content">
+            <p>Atelier de Maroquinerie d'Art</p>
+            <h1 aria-label="Élégance Tactile">Élégance <br /> Tactile</h1>
+            <a href="#collection" class="cta" role="button" aria-label="Découvrir la collection">Découvrir la
+                collection</a>
+        </div>
+    </section>
+
+    <!-- Sponsors marquee -->
+    <div class="sponsors-wrap" aria-label="Villes partenaires">
+        <div class="sponsors" id="marquee">
+            <span>SOFTURA</span>
+            <span>VISCO</span>
+            <span>FASHION</span>
+            <span>AIRTEL</span>
+            <span>SOFTURA</span>
+            <span>VISCO</span>
+            <span>FASHION</span>
+            <span>AIRTEL</span>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section class="section about reveal" id="about" aria-label="À propos">
+        <div class="about-img" id="tilt">
+            <img src="EYDWBLWJ-large.jpg" srcset="
+          EYDWBLWJ-large.jpg 600w,
+          EYDWBLWJ-large.jpg 900w,
+          EYDWBLWJ-large.jpg 1200w
+        " sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 50vw"
+                alt="Artisanat de maroquinerie — atelier So‑Lina" loading="lazy" />
+        </div>
+        <div class="about-text">
+            <h2>L'âme du geste</h2>
+            <p>Pour So‑Lina, le luxe ne réside pas dans le logo, mais dans le temps passé sur chaque perle. Chaque sac
+                est une architecture de fil et de cuir, une pièce unique conçue pour durer des décennies.</p>
+            <p class="accent">— Fabriqué à la main au Congo.</p>
+        </div>
+    </section>
+
+    <!-- COLLECTION -->
+    <section class="section reveal" id="collection" aria-label="La collection">
+        <h2 style="font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 3rem); text-align: center;">La Collection
+        </h2>
+        <div class="product-grid">
+            <!-- Card 1 -->
+            <article class="product-card" aria-label="Pochette Aurore">
+                <div class="product-inner">
+                    <div class="product-face">
+                        <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80"
+                            srcset="
+                https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=70 600w,
+                https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80 900w
+              " sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            alt="Pochette Aurore — perlage artisanal So‑Lina" loading="lazy" />
+                    </div>
+                    <div class="product-back" aria-hidden="true">
+                        <h3>Pochette "Aurore"</h3>
+                        <p>Perlage fin, doublure cuir pleine fleur.</p>
+                        <p style="color: var(--accent); font-weight: 700;">45.000 FCFA</p>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Pochette "Aurore"</h3>
+                    <p>45.000 FCFA</p>
+                </div>
+            </article>
+
+            <!-- Card 2 -->
+            <article class="product-card" aria-label="Sac Perlé Océan">
+                <div class="product-inner">
+                    <div class="product-face">
+                        <img src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=900&q=80"
+                            srcset="
+                https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=600&q=70 600w,
+                https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=900&q=80 900w
+              " sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" alt="Sac perlé Océan — So‑Lina"
+                            loading="lazy" />
+                    </div>
+                    <div class="product-back" aria-hidden="true">
+                        <h3>Sac Perlé "Océan"</h3>
+                        <p>Perles sélectionnées, montage architectural.</p>
+                        <p style="color: var(--accent); font-weight: 700;">55.000 FCFA</p>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Sac Perlé "Océan"</h3>
+                    <p>55.000 FCFA</p>
+                </div>
+            </article>
+
+            <!-- Card 3 -->
+            <article class="product-card" aria-label="Mini Sable">
+                <div class="product-inner">
+                    <div class="product-face">
+                        <img src="https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=900&q=80"
+                            srcset="
+                https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=600&q=70 600w,
+                https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=900&q=80 900w
+              " sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" alt="Mini Sable — So‑Lina"
+                            loading="lazy" />
+                    </div>
+                    <div class="product-back" aria-hidden="true">
+                        <h3>Mini "Sable"</h3>
+                        <p>Format compact, perlage dense, anse tressée.</p>
+                        <p style="color: var(--accent); font-weight: 700;">35.000 FCFA</p>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Mini "Sable"</h3>
+                    <p>35.000 FCFA</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- FORMATION -->
+    <section class="section formation" id="formation" aria-label="Formation et atelier">
+        <div class="formation-flex reveal">
+            <div>
+                <h2 style="font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 16px;">
+                    L'Atelier des <br /> Savoirs
+                </h2>
+                <p style="opacity: 0.8;">Nous croyons en la transmission. Nos formations s'adressent à ceux qui veulent
+                    toucher la matière et créer de l'exceptionnel.</p>
+            </div>
+            <div class="formation-form" aria-label="Formulaire d'inscription">
+                <form id="inscription" novalidate>
+                    <div>
+                        <label for="nom">Votre nom</label>
+                        <input type="text" id="nom" name="nom" placeholder="Ex. Lina M." required />
+                    </div>
+                    <div>
+                        <label for="whatsapp">Numéro WhatsApp</label>
+                        <input type="tel" id="whatsapp" name="whatsapp" placeholder="+242 ..." required
+                            pattern="^[+0-9\s\-]{7,}$" />
+                    </div>
+                    <div>
+                        <label for="module">Choix du module</label>
+                        <select id="module" name="module" required>
+                            <option value="" disabled selected>Choisir un module</option>
+                            <option>Module de Perlage</option>
+                            <option>Module Maroquinerie</option>
+                        </select>
+                    </div>
+                    <button class="btn-luxe" id="magnetic" type="submit" aria-label="Réserver une place">Réserver une
+                        place</button>
+                    <p id="feedback" role="status" aria-live="polite" style="margin-top: 8px; font-size: 0.9rem;"></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="contact" aria-label="Pied de page">
+        <div class="socials">
+            <a href="https://instagram.com" aria-label="Instagram"><i class="fab fa-instagram"
+                    aria-hidden="true"></i></a>
+            <a href="https://facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"
+                    aria-hidden="true"></i></a>
+            <a href="https://wa.me/242067906949" aria-label="WhatsApp"><i class="fab fa-whatsapp"
+                    aria-hidden="true"></i></a>
+        </div>
+        <p>SO‑LINA &copy; 2026</p>
+    </footer>
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+
+    <script>
+        // Wait for GSAP to be available
+        window.addEventListener('load', () => {
+            // CURSOR & AURA (toggle by removing 'cursor-enabled' class on body if needed)
+            const cursor = document.getElementById('custom-cursor');
+            const aura = document.getElementById('cursor-aura');
+            const bodyHasCursor = document.body.classList.contains('cursor-enabled');
+
+            if (bodyHasCursor) {
+                document.addEventListener('mousemove', (e) => {
+                    cursor.style.left = e.clientX + 'px';
+                    cursor.style.top = e.clientY + 'px';
+                    aura.style.left = (e.clientX - 16) + 'px';
+                    aura.style.top = (e.clientY - 16) + 'px';
+                });
+
+                document.querySelectorAll('a, button, .product-card').forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        aura.style.width = '60px';
+                        aura.style.height = '60px';
+                        aura.style.background = 'rgba(196, 154, 108, 0.12)';
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        aura.style.width = '40px';
+                        aura.style.height = '40px';
+                        aura.style.background = 'transparent';
+                    });
+                });
+            }
+
+            // NAV scroll effect
+            const nav = document.querySelector('.nav');
+            window.addEventListener('scroll', () => {
+                nav.classList.toggle('scrolled', window.scrollY > 50);
+            });
+
+            // Canvas fibres (adaptive performance)
+            const canvas = document.getElementById('canvas-fibres');
+            const ctx = canvas.getContext('2d');
+            let points = [];
+            const mouse = { x: -9999, y: -9999 };
+            let POINTS_COUNT = Math.max(40, Math.min(100, Math.floor(window.innerWidth / 20)));
+
+            function initCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                points = [];
+                for (let i = 0; i < POINTS_COUNT; i++) {
+                    points.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4
+                    });
+                }
+            }
+            function drawCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#c49a6c';
+                points.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const dist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+                    if (dist < 180) {
+                        ctx.strokeStyle = `rgba(196, 154, 108, ${1 - dist / 180})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                });
+                requestAnimationFrame(drawCanvas);
+            }
+            window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+            window.addEventListener('resize', () => { POINTS_COUNT = Math.max(40, Math.min(100, Math.floor(window.innerWidth / 20))); initCanvas(); });
+            initCanvas(); drawCanvas();
+
+            // Intersection reveal fallback (in addition to GSAP)
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+            // GSAP setup
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero parallax & split-like entrance
+            gsap.to('.hero-bg', {
+                scale: 1.18, y: 80, ease: 'none',
+                scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+            });
+            gsap.from('.hero-content h1', { opacity: 0, y: 60, duration: 1.2, ease: 'power4.out' });
+            gsap.from('.hero-content p', { opacity: 0, y: 20, duration: 0.8, delay: 0.2, ease: 'power2.out' });
+            gsap.from('.cta', { opacity: 0, y: 20, duration: 0.8, delay: 0.4, ease: 'power2.out' });
+
+            // Sponsors marquee (infinite)
+            const marquee = document.getElementById('marquee');
+            let marqueeX = 0;
+            function animateMarquee() {
+                marqueeX -= 0.4;
+                marquee.style.transform = `translateX(${marqueeX}px)`;
+                if (Math.abs(marqueeX) > marquee.scrollWidth / 2) marqueeX = 0;
+                requestAnimationFrame(animateMarquee);
+            }
+            animateMarquee();
+
+            // About tilt effect
+            const tilt = document.getElementById('tilt');
+            tilt.addEventListener('mousemove', (e) => {
+                const rect = tilt.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rx = ((y / rect.height) - 0.5) * -6;
+                const ry = ((x / rect.width) - 0.5) * 6;
+                tilt.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+            });
+            tilt.addEventListener('mouseleave', () => {
+                tilt.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            });
+
+            // Product cards stagger entrance
+            gsap.from('.product-card', {
+                opacity: 0, y: 40, duration: 0.8, stagger: 0.15, ease: 'power3.out',
+                scrollTrigger: { trigger: '#collection', start: 'top 80%' }
+            });
+
+            // Formation background subtle gradient shift
+            gsap.to('.formation', {
+                backgroundPosition: '200% 0', ease: 'none',
+                scrollTrigger: { trigger: '.formation', start: 'top bottom', end: 'bottom top', scrub: true }
+            });
+
+            // Magnetic button hover
+            const magnetic = document.getElementById('magnetic');
+            magnetic.addEventListener('mousemove', (e) => {
+                const rect = magnetic.getBoundingClientRect();
+                const strength = 12;
+                const x = ((e.clientX - rect.left) / rect.width - 0.5) * strength;
+                const y = ((e.clientY - rect.top) / rect.height - 0.5) * strength;
+                magnetic.style.transform = `translate(${x}px, ${y}px)`;
+            });
+            magnetic.addEventListener('mouseleave', () => {
+                magnetic.style.transform = 'translate(0,0)';
+            });
+
+            // Form validation + feedback
+            const form = document.getElementById('inscription');
+            const feedback = document.getElementById('feedback');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const valid = form.checkValidity();
+                if (!valid) {
+                    feedback.textContent = 'Veuillez compléter correctement tous les champs.';
+                    feedback.style.color = '#b00020';
+                    return;
+                }
+                feedback.textContent = 'Merci ! Votre demande a été enregistrée. Nous vous contacterons sous peu.';
+                feedback.style.color = 'green';
+                gsap.fromTo(feedback, { opacity: 0 }, { opacity: 1, duration: 0.6 });
+                form.reset();
+            });
+        });
+    </script>
+</body>
+
+</html>
